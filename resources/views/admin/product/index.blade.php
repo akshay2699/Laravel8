@@ -32,15 +32,15 @@
         				<td>
         					<img src="{{ url('images/',$product->image) }}" width="60" height="50">
         				</td>
-        				@if (\Auth::user()->role_id == 2)
+        				@if (Auth::user()->role_id == 2)
 	        				@if(Auth::user()->id == $product->user_id)
 	        				<td>
 	        					<a href="{{ route('product.edit', $product->id)}}" class="btn btn-warning font-weight-bold">Edit</a>
-	        					<a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a>
+	        					<!-- <a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a> -->
 	        				</td>
         					@endif
-        				@endif
-        				@if (\Auth::user()->role_id == 1)
+        				
+        				@else (Auth::user()->role_id == 1)
         				<td>
         					<a href="{{ route('product.edit', $product->id)}}" class="btn btn-warning font-weight-bold">Edit</a>
         					<a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a>
