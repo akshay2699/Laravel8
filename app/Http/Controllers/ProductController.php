@@ -17,14 +17,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        if(\Auth::check()){
-            $products = Product::all();
-            return view('admin.product.index', compact('products'));
-        }
-        else{
-            return redirect()->route('login');
-        }
-        
+        return view('admin.product.index', compact('products'));
     }
 
     /**
@@ -34,15 +27,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        if(\Auth::check()){
-            $categories = Category::all();
-            return view('admin.product.create', compact('categories'));
-        }
-        else{
-            return redirect()->route('login');
-        }
-
-        // return view('admin.product.create');
+        return view('admin.product.create', compact('categories'));
     }
 
     /**
@@ -53,7 +38,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        
         $request->validate([
             'name' => 'required',
             'description' => 'required',
