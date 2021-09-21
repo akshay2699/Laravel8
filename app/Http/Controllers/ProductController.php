@@ -109,7 +109,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $products = Product::find($id)->first();
+        // $products = Product::find($id)->first();
         
         // if($products->image != '')
         // {
@@ -147,8 +147,8 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::find($id);
-
+        $product = Product::with('categories')->whereId($id)->first();
+        $product->categories()->detach();
         $product->delete();
         return redirect()->route('product.index'); 
     }
