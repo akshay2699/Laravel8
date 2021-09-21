@@ -16,7 +16,8 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {    
+        $products = Product::all();
         return view('admin.product.index', compact('products'));
     }
 
@@ -27,7 +28,15 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('admin.product.create', compact('categories'));
+        if(\Auth::check()){
+            $categories = Category::all();
+            return view('admin.product.create', compact('categories'));
+        }
+        else{
+            return redirect()->route('login');
+        }
+
+        // return view('admin.product.create');
     }
 
     /**
