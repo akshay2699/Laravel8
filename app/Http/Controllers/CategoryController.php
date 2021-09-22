@@ -71,7 +71,7 @@ class CategoryController extends Controller
         $category->icon = isset($name) ? $name : "";
         $category->user_id = Auth::user()->id;
         // $category->product_id = 1;
-        $category->save();
+        $category->update();
         // $category->products()->attach($request->product_id);;
         return redirect()->route('category.index');
     }
@@ -130,7 +130,7 @@ class CategoryController extends Controller
         }
         $categories = Category::where('id', $id)->first();
         $categories->name = $request->name;
-        $categories->icon = isset($name) ? $name : "";
+        $categories->icon = isset($name) ? $name : $categories->icon;
         $categories->save();
         return redirect()->route('category.index');
     }

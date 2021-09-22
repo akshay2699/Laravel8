@@ -29,7 +29,7 @@
                             <label for="icon" class="col-md-4 col-form-label text-md-right">{{ __('Icon') }}</label>
 
                             <div class="col-md-6">
-                                <input id="icon" type="file" class="form-control @error('icon') is-invalid @enderror" name="icon" value="{{ $categories->icon }}" required autocomplete="icon" autofocus placeholder="Enter Name">
+                                <input id="icon" type="file" class="form-control @error('icon') is-invalid @enderror" name="icon" value="{{ $categories->icon }}" autocomplete="icon" autofocus placeholder="Select Icon">
                                 <p>{{ $categories->icon }}</p>
                                 @error('icon')
                                     <span class="invalid-feedback" role="alert">
