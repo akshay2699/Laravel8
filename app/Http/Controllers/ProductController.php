@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
-// use App\Models\ProductCategory;
 use Auth;
 
 class ProductController extends Controller
@@ -28,15 +27,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        if(\Auth::check()){
-            $categories = Category::all();
-            return view('admin.product.create', compact('categories'));
-        }
-        else{
-            return redirect()->route('login');
-        }
-
-        // return view('admin.product.create');
+        $categories = Category::all();
+        return view('admin.product.create', compact('categories'));
     }
 
     /**
