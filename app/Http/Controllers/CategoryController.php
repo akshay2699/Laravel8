@@ -25,14 +25,9 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {    
-        if(\Auth::check()){
-            $categories = Category::all();
-            return view('admin.category.index', compact('categories'));    
-        }
-        else{
-            return redirect()->route('login');
-        }
+    {        
+        $categories = Category::all();
+        return view('admin.category.index', compact('categories'));    
     }
 
     /**
