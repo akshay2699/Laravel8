@@ -36,7 +36,7 @@
 	        				@if(Auth::user()->id == $product->user_id)
 	        				<td>
 	        					<a href="{{ route('product.edit', $product->id)}}" class="btn btn-warning font-weight-bold">Edit</a>
-	        					<!-- <a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a> -->
+	        					<a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a>
 	        				</td>
         					@endif
         				
