@@ -125,7 +125,7 @@ class ProductController extends Controller
         $products->name = $request->name;
         $products->description = $request->description;
         $products->price = $request->price;
-        $products->image = isset($name) ? $name : "";
+        $products->image = isset($name) ? $name : $products->image;
 
         $products->update();
         $products->categories()->sync($request->category);        

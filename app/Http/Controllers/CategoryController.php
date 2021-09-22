@@ -131,7 +131,7 @@ class CategoryController extends Controller
         $categories = Category::where('id', $id)->first();
         $categories->name = $request->name;
         $categories->icon = isset($name) ? $name : $categories->icon;
-        $categories->save();
+        $categories->update();
         return redirect()->route('category.index');
     }
 
