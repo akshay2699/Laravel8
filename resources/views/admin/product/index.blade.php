@@ -4,14 +4,14 @@
 
 	<div class="container">
     	<h1 class="text-center">All Product Details</h1>
-    	<a class="btn btn-outline-primary font-weight-bold" href="{{ route('product.create')}}">
+    	<a class="btn btn-outline-success font-weight-bold" href="javascript:void(0)" id="createNewProduct">
     	Add New
     	<span>
     		<i class=" fa fa-plus"></i>
     	</span>
     	</a>
   		<hr />
-    	<table class="table table-bordered data-table">
+    	<table class="table table-bordered data-table" id="myTable">
         	<thead>
             	<tr>
                 	<th>Id</th>
@@ -23,34 +23,135 @@
             	</tr>
         	</thead>
         	<tbody>
-        		@foreach($products as $product)
-        			<tr>
-        				<td>{{ $product->id }}</td>
-        				<td>{{ $product->name }}</td>
-        				<td>{{ $product->description }}</td>
-        				<td>{{ $product->price }}</td>
-        				<td>
-        					<img src="{{ url('images/',$product->image) }}" width="60" height="50">
-        				</td>
-        				@if (Auth::user()->role_id == 2)
-	        				@if(Auth::user()->id == $product->user_id)
-	        				<td>
-	        					<!-- <a href="{{ route('product.show', $product->id)}}" class="btn btn-info font-weight-bold">Show</a> -->
-	        					<a href="{{ route('product.edit', $product->id)}}" class="btn btn-warning font-weight-bold">Edit</a>
-	        					<a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a>
-	        				</td>
-        					@endif
-        				
-        				@else (Auth::user()->role_id == 1)
-        				<td>
-        					<!-- <a href="{{ route('product.show', $product->id)}}" class="btn btn-info font-weight-bold">Show</a> -->
-        					<a href="{{ route('product.edit', $product->id)}}" class="btn btn-warning font-weight-bold">Edit</a>
-        					<a href="{{ route('product.destroy', $product->id)}}" class="btn btn-danger font-weight-bold">Delete</a>
-        				</td>
-        				@endif
-        			</tr>
-        		@endforeach
         	</tbody>
     	</table>
 	</div>
+	<div class="modal fade" id="ajaxModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="modalHeading"></h4>
+				</div>
+				<div class="modal-body">
+					<form id="productForm" name="productForm" class="" enctype="multipart/form-data">
+						@csrf
+						<input type="hidden" name="product_id" id="product_id" value="">
+						<div class="form-group">
+							Name : <br/>
+							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="">
+						</div>
+						<div class="form-group">
+							Description : <br/>
+							<textarea type="text" class="form-control" id="description" name="description" placeholder="Product Description" value=""></textarea>
+						</div>
+						<div class="form-group">
+							Price : <br/>
+							<input type="text" class="form-control" id="price" name="price" placeholder="Product Price" value="">
+						</div>
+						<div class="form-group">
+							Image : <br/>
+							<input type="file" class="form-control" id="image" name="image" placeholder="Select Image" value="">
+                            <img name="image_id" id="image_id" width="50" height="50">
+						</div>
+						<button type="submit" class="btn btn-primary" id="saveBtn" value="create">
+							Submit
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>	
+	</div>
 @endsection
+@push('scripts')
+<script type="text/javascript">
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $(document).ready( function () {
+        var table = $('#myTable').DataTable({
+            processing: true,
+            serverSide: true,
+            autoWidth: false,
+            pageLength: 5,
+            // scrollX: true,
+            "order": [[ 0, "desc" ]],
+            ajax: '{{ route("product.index") }}',
+            columns: [
+                {data: 'id', name: 'id'},
+                {data: 'name', name: 'name'},
+                {data: 'description', name: 'description'},
+                {data: 'price', name: 'price'},
+                {data: 'image', "render":function(data, type, row)
+                    {
+                        return '<img src="public/images/'+data+'" width="60px" height="50px" />';
+                    }
+                },
+                {data: 'action', name: 'action',orderable:false,serachable:false,sClass:'text-center'},
+            ]
+        });
+
+        $('#createNewProduct').click(function(){
+            $('#product_id').val('');
+            $('#productForm').trigger("reset");
+            $('#modalHeading').html("Add New Product");
+            $('#ajaxModal').modal('show');
+            $("#image_id").css("display", "none");
+        });
+
+        $('#productForm').on('submit', function(event){
+            event.preventDefault();
+            $.ajax({
+                url:"{{ route('product.store')}}",
+                method:"POST",
+                data: new FormData(this),
+                dataType:'JSON',
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data){
+                    $('#productForm').trigger("reset");
+                    $('#ajaxModal').modal('hide');
+                    table.draw();
+                }
+            });
+        });
+
+        $('body').on('click', '.deleteProducts', function(){
+            var product_id = $(this).data("id");
+            confirm("Are you sure want to delete! ");
+            $.ajax({
+                type:"DELETE",
+                url: "{{ route('product.index')}}"+'/'+product_id,
+                success: function(data){
+                    table.draw();
+                    // table.ajax.reload();
+                },
+                error: function(data){
+                    console.log('Error', data);
+                }
+            });
+        });
+
+        $('body').on('click', '.editProducts', function(){
+
+            var product_id = $(this).data("id");
+
+            $.get("{{ route('product.index')}}"+"/"+product_id+"/edit", function(data){
+                $("#modalHeading").html("Edit Product");
+                $("#ajaxModal").modal('show');
+                $("#product_id").val(data.id);
+                $("#name").val(data.name);
+                $("#description").val(data.description);
+                $("#price").val(data.price);
+                // $("#old").val(data.image);
+                $("#image_id").attr("src","{{ url('public/images')}}"+"/"+data.image);
+                $("#image").attr("value",data.image);
+            });
+        });
+    });
+</script>
+
+
+@endpush

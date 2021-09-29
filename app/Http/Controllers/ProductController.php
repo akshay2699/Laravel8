@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use DataTables;
 use Auth;
 
 class ProductController extends Controller
@@ -14,10 +15,30 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {    
-        $products = Product::all();
-        return view('admin.product.index', compact('products'));
+        $products = Product::get();
+        $categories = Category::all();
+        if($request->ajax()){
+            $allData = DataTables::of($products)
+            ->addIndexColumn()
+            ->addColumn('action', function($row){
+                if(Auth()->user()->role_id == 2 && Auth::user()->id == $row->user_id){
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary mr-2 editProducts" id="editProducts">Edit</a>';
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteProducts" id="deleteProducts">Delete</a>';
+                return $btn;
+                }
+                if(Auth()->user()->role_id == 1){
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary mr-2 editProducts" id="editProducts">Edit</a>';
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteProducts" id="deleteProducts">Delete</a>';
+                return $btn;
+                }
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+            return $allData;
+        }
+        return view('admin.product.index', compact('products','categories'));    
     }
 
     /**
@@ -27,8 +48,6 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
-        return view('admin.product.create', compact('categories'));
     }
 
     /**
@@ -39,33 +58,35 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // dd($request->all());
+        
+        request()->validate([
             'name' => 'required',
             'description' => 'required',
             'price' => 'required',
-            'image' => 'required',
-            'category' => ['required', 'array', 'min:1'],
-            // 'categories_id.*' => ['required', 'integer', 'exists:categories,id'],
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg',
         ]);
-  
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $path = public_path('images/');
-            $name = time().rand(1, 99999) . "." . $image->getClientOriginalExtension();
-            $image->move($path, $name);
-        }
-        
-        $product = new Product;
-        
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->price = $request->price;
-        $product->image = isset($name) ? $name : "";
-        $product->user_id = Auth::user()->id;
-
-        $product->save();
-        $product->categories()->attach($request->category);
-        return redirect()->route('product.index');
+         
+            $productId = $request->product_id;
+         
+            $details = ['name' => $request->name,'description' => $request->description ,'price' => $request->price, 'user_id' => Auth::user()->id];
+         
+            if ($files = $request->file('image')) {
+                
+               //delete old file
+             
+               //insert new file
+               $destinationPath = 'public/images/'; // upload path
+               $profileImage = date('YmdHis') . "." . $files->getClientOriginalExtension();
+               $files->move($destinationPath, $profileImage);
+               $details['image'] = "$profileImage";
+            }
+             
+            $product   =   Product::updateOrCreate(['id' => $productId], $details);  
+                   
+            
+        return response()->json(['success'=>'Product Added Sucessfully']);
+        // $product->categories()->attach($request->category);
     }
 
     /**
@@ -88,9 +109,8 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $category_id = Category::select('id','name')->get();
-        $products = Product::with('categories')->whereId($id)->first();
-        return view('admin.product.edit', compact('products', 'category_id'));
+        $products = Product::find($id);
+        return response()->json($products);
     }
 
     /**
@@ -102,34 +122,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $products = Product::find($id)->first();
-        
-        // if($products->image != '')
-        // {
-        //     $path = public_path('/images/');
-        //     if($products->image != ''  && $products->image != null){
-        //        $file_old = $path.$products->image;
-        //        unlink($file_old);
-        //     }
-        // }
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $path = public_path('images/');
-            $name = time().rand(1, 99999) . "." . $image->getClientOriginalExtension();
-            $image->move($path, $name);
-            // dd($name);
-        }
-
-        $products = Product::with('categories')->whereId($id)->first();
-        $products->name = $request->name;
-        $products->description = $request->description;
-        $products->price = $request->price;
-        $products->image = isset($name) ? $name : $products->image;
-
-        $products->update();
-        $products->categories()->sync($request->category);        
-        return redirect()->route('product.index');
     }
 
     /**
@@ -140,9 +133,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::with('categories')->whereId($id)->first();
-        $product->categories()->detach();
-        $product->delete();
-        return redirect()->route('product.index'); 
+        Product::find($id)->delete();
+        return response()->json(['success'=>'Product deleted successfully.']);
     }
 }

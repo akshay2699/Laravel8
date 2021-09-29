@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Category;
+use DataTables;
 
 class CategoryController extends Controller
 {
@@ -25,8 +26,28 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {        
-        $categories = Category::all();
+    {  
+        $categories = Category::get();
+    
+        if($request->ajax()){
+            $allData = DataTables::of($categories)
+            ->addIndexColumn()
+            ->addColumn('action', function($row){
+                if(Auth()->user()->role_id == 2 && Auth::user()->id == $row->user_id){
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary mr-2 editCategories" id="editCategories">Edit</a>';
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteCategories" id="deleteCategories">Delete</a>';
+                return $btn;
+                }
+                if(Auth()->user()->role_id == 1){
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary mr-2 editCategories" id="editCategories">Edit</a>';
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteCategories" id="deleteCategories">Delete</a>';
+                return $btn;
+                }
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+            return $allData;
+        }
         return view('admin.category.index', compact('categories'));    
     }
 
@@ -47,28 +68,30 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $request->validate([
+    {   
+      request()->validate([
             'name' => 'required',
-            'icon' => 'required',
+            'icon' => 'image|mimes:jpeg,png,jpg,gif,svg',
         ]);
-  
-        if ($request->hasFile('icon')) {
-            $image = $request->file('icon');
-            $path = public_path('images/');
-            $name = time().rand(1, 99999) . "." . $image->getClientOriginalExtension();
-            $image->move($path, $name);
-            // dd($name);
-        }
+         
+            $categoryId = $request->category_id;
+         
+            $details = ['name' => $request->name, 'user_id' => Auth::user()->id];
+         
+            if ($files = $request->file('icon')) {
+                
+               //delete old file
+             
+               //insert new file
+               $destinationPath = 'public/images/'; // upload path
+               $profileImage = date('YmdHis') . "." . $files->getClientOriginalExtension();
+               $files->move($destinationPath, $profileImage);
+               $details['icon'] = "$profileImage";
+            }
+             
+            $product   =   Category::updateOrCreate(['id' => $categoryId], $details);  
 
-        $category = new Category;
-        $category->name = $request->name;
-        $category->icon = isset($name) ? $name : "";
-        $category->user_id = Auth::user()->id;
-        // $category->product_id = 1;
-        $category->update();
-        // $category->products()->attach($request->product_id);;
-        return redirect()->route('category.index');
+        return response()->json(['success'=>'Category Added Sucessfully']);
     }
 
     /**
@@ -91,9 +114,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $categories = Category::find($id);
-        return view('admin.category.edit', compact('categories'));
-        // echo "<pre>";
-        // print_r($category->toArray());
+        return response()->json($categories);
     }
 
     /**
@@ -105,29 +126,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $categories = Category::find($id)->first();
         
-        // if($categories->icon != '')
-        // {
-        //     $path = public_path('images/');
-        //     if($categories->icon != ''  && $categories->icon != null){
-        //        $file_old = $path.$categories->icon;
-        //        unlink($file_old);
-        //     }
-        // }
-  
-        if ($request->hasFile('icon')) {
-            $image = $request->file('icon');
-            $path = public_path('images/');
-            $name = time().rand(1, 99999) . "." . $image->getClientOriginalExtension();
-            $image->move($path, $name);
-            // dd($name);
-        }
-        $categories = Category::where('id', $id)->first();
-        $categories->name = $request->name;
-        $categories->icon = isset($name) ? $name : $categories->icon;
-        $categories->update();
-        return redirect()->route('category.index');
     }
 
     /**
@@ -137,10 +136,8 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        $category = Category::find($id);
-
-        $category->delete();
-        return redirect()->route('category.index');   
+    {   
+        Category::find($id)->delete();
+        return response()->json(['success'=>'Category deleted successfully.']);
     }
 }
