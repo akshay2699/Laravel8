@@ -125,13 +125,13 @@
                     table.draw();
                 },
                 error:function(data){
-                    if($('#name').val() == ''){
+                    if($('#name').val() == '' || $('#name').val() != ''){
                         $('.required-name').html('<span class="el-error-msg">Product Name can not be blank...</span>');
                     }
-                    else if($('#description').val() == ''){
+                    else if($('#description').val() == '' || $('#description').val() != ''){
                         $('.required-description').html('<span class="el-error-msg">Description field can not be blank...</span>');
                     }
-                    else if($('#price').val() == ''){
+                    else if($('#price').val() == '' || $('#price').val() != ''){
                         $('.required-price').html('<span class="el-error-msg">Price field can not be blank...</span>');
                     }
                     else{
