@@ -114,7 +114,7 @@
                 },
                 error:function(data){
                     if($('#name').val() == ''){
-                        $('.required-name').html('<span class="el-error-msg">Name field can not be blank...</span>');
+                        $('.required-name').html('<span class="el-error-msg">Category Name field can not be blank...</span>');
                         $('html, body').animate({ scrollTop: $('.required-name').parent().offset().top - 80}, 100);
                     }
                     else{
