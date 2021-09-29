@@ -48,6 +48,7 @@ class CategoryController extends Controller
             ->make(true);
             return $allData;
         }
+        // return response()->json(['success'=>'Category Added Sucessfully']);
         return view('admin.category.index', compact('categories'));    
     }
 
@@ -90,7 +91,6 @@ class CategoryController extends Controller
             }
              
             $product   =   Category::updateOrCreate(['id' => $categoryId], $details);  
-
         return response()->json(['success'=>'Category Added Sucessfully']);
     }
 

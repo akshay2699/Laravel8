@@ -38,12 +38,17 @@
 						<div class="form-group">
 							Name : <br/>
 							<input type="text" class="form-control" id="name" name="name" placeholder="Category Name" value="">
+                            <div class="required-name text-danger">
+                                
+                            </div>
 						</div>
 						<div class="form-group">
 							Icon : <br/>
 							<input type="file" class="form-control" id="icon" name="icon" placeholder="Category Icon" value="">
-
-                                <img name="icon_id" id="icon_id" width="50" height="50">
+                            <div class="required-icon text-danger">
+                                
+                            </div>
+                            <img name="icon_id" id="icon_id" width="50" height="50">
 						</div>
 						<button type="submit" class="btn btn-primary" id="saveBtn" value="create">
 							Submit
@@ -82,7 +87,6 @@
                 {data: 'action', name: 'action',orderable:false,serachable:false,sClass:'text-center'},
             ]
         });
-
         //Add categories by ajax
         $('#createNewCategory').click(function(){
             $('#category_id').val('');
@@ -94,6 +98,7 @@
 
         $('#categoryForm').on('submit', function(event){
             event.preventDefault();
+            
             $.ajax({
                 url:"{{ route('category.store')}}",
                 method:"POST",
@@ -106,6 +111,15 @@
                     $('#categoryForm').trigger("reset");
                     $('#ajaxModal').modal('hide');
                     table.draw();
+                },
+                error:function(data){
+                    if($('#name').val() == ''){
+                        $('.required-name').html('<span class="el-error-msg">Name field can not be blank...</span>');
+                        $('html, body').animate({ scrollTop: $('.required-name').parent().offset().top - 80}, 100);
+                    }
+                    else{
+                      $('.required-name').text('');
+                    }
                 }
             });
         });

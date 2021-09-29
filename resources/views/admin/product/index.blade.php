@@ -39,14 +39,23 @@
 						<div class="form-group">
 							Name : <br/>
 							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="">
+                            <div class="required-name text-danger">
+                                
+                            </div>
 						</div>
 						<div class="form-group">
 							Description : <br/>
 							<textarea type="text" class="form-control" id="description" name="description" placeholder="Product Description" value=""></textarea>
+                            <div class="required-description text-danger">
+                                
+                            </div>
 						</div>
 						<div class="form-group">
 							Price : <br/>
 							<input type="text" class="form-control" id="price" name="price" placeholder="Product Price" value="">
+                            <div class="required-price text-danger">
+                                
+                            </div>
 						</div>
 						<div class="form-group">
 							Image : <br/>
@@ -114,6 +123,22 @@
                     $('#productForm').trigger("reset");
                     $('#ajaxModal').modal('hide');
                     table.draw();
+                },
+                error:function(data){
+                    if($('#name').val() == ''){
+                        $('.required-name').html('<span class="el-error-msg">Product Name can not be blank...</span>');
+                    }
+                    else if($('#description').val() == ''){
+                        $('.required-description').html('<span class="el-error-msg">Description field can not be blank...</span>');
+                    }
+                    else if($('#price').val() == ''){
+                        $('.required-price').html('<span class="el-error-msg">Price field can not be blank...</span>');
+                    }
+                    else{
+                      $('.required-name').text('');
+                      $('.required-description').text('');
+                      $('.required-price').text('');
+                    }
                 }
             });
         });
