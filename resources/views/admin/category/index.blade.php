@@ -37,14 +37,14 @@
 						<input type="hidden" name="category_id" id="category_id" value="">
 						<div class="form-group">
 							Name : <br/>
-							<input type="text" class="form-control" id="name" name="name" placeholder="Category Name" value="">
+							<input type="text" class="form-control" id="name" name="name" placeholder="Category Name" value="" required>
                             <div class="required-name text-danger">
                                 
                             </div>
 						</div>
 						<div class="form-group">
 							Icon : <br/>
-							<input type="file" class="form-control" id="icon" name="icon" placeholder="Category Icon" value="">
+							<input type="file" class="form-control" id="icon" name="icon" placeholder="Category Icon" value="" >
                             <div class="required-icon text-danger">
                                 
                             </div>
@@ -67,6 +67,7 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
     $(document).ready( function () {
         var table = $('#myTable').DataTable({
             processing: true,
@@ -95,10 +96,8 @@
             $('#ajaxModal').modal('show');
             $("#icon_id").css("display", "none");
         });
-
         $('#categoryForm').on('submit', function(event){
             event.preventDefault();
-            
             $.ajax({
                 url:"{{ route('category.store')}}",
                 method:"POST",
@@ -115,7 +114,6 @@
                 error:function(data){
                     if($('#name').val() == '' || $('#name').val() != ''){
                         $('.required-name').html('<span class="el-error-msg">Category Name field can not be blank...</span>');
-                        $('html, body').animate({ scrollTop: $('.required-name').parent().offset().top - 80}, 100);
                     }
                     else{
                       $('.required-name').text('');

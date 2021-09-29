@@ -38,21 +38,21 @@
 						<input type="hidden" name="product_id" id="product_id" value="">
 						<div class="form-group">
 							Name : <br/>
-							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="">
+							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="" required>
                             <div class="required-name text-danger">
                                 
                             </div>
 						</div>
 						<div class="form-group">
 							Description : <br/>
-							<textarea type="text" class="form-control" id="description" name="description" placeholder="Product Description" value=""></textarea>
+							<textarea type="text" class="form-control" id="description" name="description" placeholder="Product Description" value="" required></textarea>
                             <div class="required-description text-danger">
                                 
                             </div>
 						</div>
 						<div class="form-group">
 							Price : <br/>
-							<input type="text" class="form-control" id="price" name="price" placeholder="Product Price" value="">
+							<input type="text" class="form-control" id="price" name="price" placeholder="Product Price" value="" required>
                             <div class="required-price text-danger">
                                 
                             </div>
@@ -108,6 +108,13 @@
             $('#ajaxModal').modal('show');
             $("#image_id").css("display", "none");
         });
+
+         $("#productForm").validate({
+               rules: {
+                 // no quoting necessary
+                 name: "required",
+               }
+             });
 
         $('#productForm').on('submit', function(event){
             event.preventDefault();
