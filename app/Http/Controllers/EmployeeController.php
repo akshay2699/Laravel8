@@ -59,7 +59,7 @@ class EmployeeController extends Controller
             'fname'         => 'required',
             'lname'         => 'required',
             'email'         => 'required|email',
-            'phone'         => 'required|regex:/[0-9]/|digits:10',     
+            'phone'         => 'required|numeric|digits:10',     
             'company'       => 'required'
         ]);
         if (!$validator->passes()) {

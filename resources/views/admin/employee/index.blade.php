@@ -120,6 +120,7 @@
             $('#employeeForm').trigger("reset");
             $('#modalHeading').html("Add New Employee");
             $('#ajaxModal').modal('show');
+            $('.print-error-msg').css('display', 'none');
         });
 
          $('#employeeForm').on('submit', function(event){
@@ -137,27 +138,27 @@
                         // alert(data.success);
                         $('#employeeForm').trigger("reset");
                         $('#ajaxModal').modal('hide');
-                            table.draw();
+                        $('.print-error-msg').trigger('reset');
+                        table.draw();
                     }else{
                         printErrorMsg(data.error);
-                    }    
+                    }
                 },
             });
         });
-
         function printErrorMsg (msg) {
             $(".print-error-msg").find("ul").html('');
             $(".print-error-msg").css('display','block');
             $.each( msg, function( key, value ) {
                 $(".print-error-msg").find("ul").append('<li>'+value+'</li>');
             });
-        }
-
+        } 
         // Edit record by ajax to database
         $('body').on('click', '.editEmployee', function(){
             var employee_id  = $(this).data("id");
 
             $.get("{{ route('employee.index')}}"+"/"+employee_id+ "/edit", function(data){
+                $(".print-error-msg").css("display","none");
                 $("#modalHeading").html("Edit Employee Details");
                 $("#ajaxModal").modal('show');
                 $("#employee_id" ).val(data.id);
