@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Employee;
+use App\Models\Company;
+use DataTables;
+use Validator;
 
 class EmployeeController extends Controller
 {
@@ -11,9 +15,26 @@ class EmployeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $companies = Company::all();
+        if ($request->ajax()) {
+            $data = Employee::select('*');
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('actions', function($row){
+
+                    $btn= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary editEmployee mr-2" id="editEmployee">Edit</a>';
+
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteEmployee" id="deleteEmployee">Delete</a>';    
+                            
+                    return $btn;
+                    })
+                    ->rawColumns(['actions'])
+                    ->make(true);
+        }
+        
+        return view('admin.employee.index', compact('companies'));
     }
 
     /**
@@ -34,7 +55,30 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(),[
+            'fname'         => 'required',
+            'lname'         => 'required',
+            'email'         => 'required|email',
+            'phone'         => 'required|regex:/[0-9]/|digits:10',     
+            'company'       => 'required'
+        ]);
+        if (!$validator->passes()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+            
+        $employeeId = $request->employee_id;
+     
+        $details = [
+            'fname'         => $request->fname,
+            'lname'         => $request->lname,
+            'email'         => $request->email,
+            'phone'         => $request->phone,
+            'company_id'    => $request->company,
+        ];
+         
+        $employee = Employee::updateOrCreate(['id' => $employeeId], $details);  
+        
+        return response()->json(['success'=>'Employee saved successfully.']);
     }
 
     /**
@@ -56,7 +100,8 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        //
+        $employee = Employee::find($id);
+        return response()->json($employee);
     }
 
     /**
@@ -79,6 +124,7 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Employee::find($id)->delete();
+
     }
 }

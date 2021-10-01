@@ -38,7 +38,7 @@
 						<input type="hidden" name="product_id" id="product_id" value="">
 						<div class="form-group">
 							Name : <br/>
-							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="" required>
+							<input type="text" class="form-control" id="name" name="name" placeholder="Product Name" value="">
                             <div class="required-name text-danger">
                                 
                             </div>
@@ -54,7 +54,7 @@
 							Price : <br/>
 							<input type="text" class="form-control" id="price" name="price" placeholder="Product Price" value="" required>
                             <div class="required-price text-danger">
-                                
+
                             </div>
 						</div>
 						<div class="form-group">

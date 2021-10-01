@@ -79,6 +79,7 @@
         </nav>
 
         <main class="py-4">
+            @include('flash-message')
             @yield('content')
         </main>
     </div>
@@ -87,6 +88,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script type="text/javascript">
+        $('div.alert').fadeOut(4000);
+    </script>
     @stack('scripts')
 </body>
   

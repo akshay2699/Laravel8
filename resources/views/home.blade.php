@@ -25,6 +25,12 @@
                         <a class="btn btn-secondary bg-dark ml-2 mb-2" href="{{ route('product.index') }}">   
                             Product Details
                         </a>
+                        <a class="btn btn-secondary bg-dark ml-2 mb-2" href="{{ route('employee.index') }}">   
+                            Employee Details
+                        </a>
+                        <a class="btn btn-secondary bg-dark ml-2 mb-2" href="{{ route('company.index') }}">   
+                            Company Details
+                        </a>
                     @endif
                     @if (\Auth::user()->role_id == 2)
                         <center><h1>Welcome User</h1></center><br>

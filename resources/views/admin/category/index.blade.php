@@ -37,7 +37,8 @@
 						<input type="hidden" name="category_id" id="category_id" value="">
 						<div class="form-group">
 							Name : <br/>
-							<input type="text" class="form-control" id="name" name="name" placeholder="Category Name" value="" required>
+							<input type="text" class="form-control" id="name" name="name" placeholder="Category Name" value="">
+
                             <div class="required-name text-danger">
                                 
                             </div>
@@ -96,8 +97,6 @@
             $('#ajaxModal').modal('show');
             $("#icon_id").css("display", "none");
         });
-        $('#categoryForm').on('submit', function(event){
-            event.preventDefault();
             $.ajax({
                 url:"{{ route('category.store')}}",
                 method:"POST",
@@ -120,7 +119,7 @@
                     }
                 }
             });
-        });
+    
         $('body').on('click', '.deleteCategories', function(){
             var category_id = $(this).data("id");
             confirm("Are you sure want to delete! ");

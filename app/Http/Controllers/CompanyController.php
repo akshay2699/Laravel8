@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Company;
+use DataTables;
+use Validator;
 
 class CompanyController extends Controller
 {
@@ -11,9 +14,25 @@ class CompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $data = Company::select('*');
+            return Datatables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('actions', function($row){
+
+                    $btn= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Edit" class="edit btn btn-primary editCompany mr-2" id="editCompany">Edit</a>';
+
+                    $btn.= '<a href="javascript:void(0)" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title-="Delete" class="edit btn btn-danger deleteCompany" id="deleteCompany">Delete</a>';    
+                            
+                    return $btn;
+                    })
+                    ->rawColumns(['actions'])
+                    ->make(true);
+        }
+        
+        return view('admin.company.index');
     }
 
     /**
@@ -23,7 +42,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.company.create');
     }
 
     /**
@@ -34,7 +53,36 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(),[
+            'name'      => 'required',
+            'email'     => 'required|email',
+            'logo'      => 'image|mimes:jpeg,png,jpg',
+            'website'   => 'required',     
+        ]);
+        if (!$validator->passes()) {
+            return response()->json(['error'=>$validator->errors()->all()]);
+        }
+            
+        $companyId = $request->company_id;
+     
+        $details = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'website' => $request->website
+        ];
+     
+        if ($files = $request->file('logo')) {
+         
+           //insert new file
+           $destinationPath = 'images/'; // upload path
+           $profileImage = date('YmdHis') . "." . $files->getClientOriginalExtension();
+           $files->move($destinationPath, $profileImage);
+           $details['logo'] = "$profileImage";
+        }
+         
+        $company = Company::updateOrCreate(['id' => $companyId], $details);  
+        
+        return response()->json(['success'=>'Company saved successfully.']);
     }
 
     /**
@@ -56,7 +104,8 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        //
+        $company = Company::find($id);
+        return response()->json($company);
     }
 
     /**
@@ -79,6 +128,7 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Company::find($id)->delete();
+        return response()->json(['success'=>'Company deleted successfully.']);
     }
 }
