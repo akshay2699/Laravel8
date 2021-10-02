@@ -20,7 +20,7 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Companies</th>
-                <th width="180px">Action</th>
+                <th width="115px">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -109,7 +109,7 @@
                 {data: 'lname', name: 'lname'},
                 {data: 'email', name: 'email'},
                 {data: 'phone', name: 'phone'},
-                {data: 'company_id', name: 'company_id'},
+                {data: 'company.name', name: 'company.name'},
                 {data: 'actions', name: 'actions', orderable: true, searchable: true},
             ]
         });

@@ -18,8 +18,14 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         $companies = Company::all();
+        // dd($request->all());
         if ($request->ajax()) {
-            $data = Employee::select('*');
+            $data = Employee::with('company')->get();
+            
+            // $data =  Employee::select('employees.*','companies.name')
+            //     ->join('companies', 'companies.id', '=', 'employees.company_id')
+            //     ->get();
+
             return Datatables::of($data)
                     ->addIndexColumn()
                     ->addColumn('actions', function($row){
